@@ -16,10 +16,8 @@ http://127.0.0.1:7001/busi/swagger/index.html
 ```
 make # make to see help
 ```
-
 ### Run
     bin/fevm-event --conf conf/service.conf
-
 ### Useage
     call api: /event[POST] without query paramters by dolphin scheduler per 60s.
 
