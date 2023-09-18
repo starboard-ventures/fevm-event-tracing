@@ -1,0 +1,55 @@
+basePath: /api/v1
+host: localhost:7001
+info:
+  contact:
+    email: xueyou@starboardventures.io
+    name: xueyouchen
+  description: starboard event tracking job
+  termsOfService: http://swagger.io/terms/
+  title: starboard fevm event tracking job
+  version: "1.0"
+paths:
+  /event:
+    post:
+      consumes:
+      - application/json
+      - application/json
+      description: event cron job api, call by dolphin scheduler
+      parameters:
+      - in: query
+        name: maxHeight
+        type: integer
+      - in: query
+        name: minHeight
+        type: integer
+      produces:
+      - application/json
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+      tags:
+      - Inner
+  /ping:
+    get:
+      consumes:
+      - application/json
+      - application/json
+      description: Healthy examination
+      produces:
+      - application/json
+      - application/json
+      responses:
+        "200":
+          description: pong
+          schema:
+            type: string
+        "500":
+          description: error:...
+          schema:
+            type: string
+      tags:
+      - Sys
+swagger: "2.0"

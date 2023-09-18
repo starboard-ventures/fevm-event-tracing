@@ -1,0 +1,6 @@
+title = "fevm_event_tracking_calibration"
+
+[fevm_event]
+    listen = ":7001"
+    database = "postgres://user:password@ip/dbname?sslmode=disable"
+    lotus = "https://api.calibration.node.glif.io/rpc/v1"
