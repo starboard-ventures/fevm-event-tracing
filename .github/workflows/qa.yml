@@ -1,0 +1,30 @@
+name: Branch Test Workflow
+
+on:
+  push:
+    tags:
+      - 't*.*.*'
+
+jobs:
+  CI:
+    name: Build
+    uses: starboard-ventures/workflows/.github/workflows/build_push.yml@main
+    with:
+      aws_region: us-east-2
+      environment: test
+      image_repo_project: fevm-event-tracking
+    secrets: inherit
+
+  Deploy_to_test:
+    name: Deploy
+    uses: ./.github/workflows/deploy.yml
+    needs: [CI]
+    with:
+      image_tag: ${{ needs.CI.outputs.image_tag }}
+      cicd_repo: starboard-ventures/cicd
+      eks_cluster_name: starboard-dev-dev-eks
+      aws_region: us-east-2
+      aws_account_repository: 129862287110
+      environment: test
+      project: fevm-event-tracking
+    secrets: inherit

@@ -1,0 +1,60 @@
+on:
+  workflow_call:
+    inputs:
+      image_tag:
+        required: true
+        type: string
+      environment:
+        required: true
+        type: string
+      project:
+        required: true
+        type: string
+      cicd_repo:
+        required: true
+        type: string
+      eks_cluster_name:
+        required: true
+        type: string
+      aws_region:
+        required: true
+        type: string
+      aws_account_repository:
+        required: true
+        type: string
+
+jobs:
+  Deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS credentials
+        id: aws_credentials
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          aws-access-key-id: ${{ inputs.environment == 'prod' && secrets.PROD_AWS_ACCESS_KEY_ID || secrets.DEV_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ inputs.environment == 'prod' && secrets.PROD_AWS_SECRET_ACCESS_KEY || secrets.DEV_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ inputs.aws_region }}
+          mask-aws-account-id: 'no'
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          registries: "${{ inputs.aws_account_repository }}"
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: ${{ inputs.cicd_repo }}
+          token: ${{ secrets.CICD_REPO_READ_TOKEN }}
+          path: cicd
+
+      - name: Deploy
+        uses: ./cicd/actions/eks-action
+        env:
+          cluster_name: ${{ inputs.eks_cluster_name }}
+          IMAGE_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ inputs.image_tag }}
+          PROJECT: ${{ inputs.project }}
+        with:
+          args: bash cicd/charts/deploy-calibration-$PROJECT.sh ${{ inputs.environment }}

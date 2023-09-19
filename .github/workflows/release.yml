@@ -1,0 +1,30 @@
+name: Release Workflow
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  CI:
+    name: Build
+    uses: starboard-ventures/workflows/.github/workflows/build_push.yml@main
+    with:
+      aws_region: us-east-2
+      environment: prod
+      image_repo_project: fevm-event-tracking
+    secrets: inherit
+
+  Deploy_to_prod:
+    name: Deploy
+    uses: ./.github/workflows/deploy.yml
+    needs: [CI]
+    with:
+      image_tag: ${{ needs.CI.outputs.image_tag }}
+      cicd_repo: starboard-ventures/cicd
+      aws_region: us-east-2
+      aws_account_repository: 129862287110
+      eks_cluster_name: starboard-prod-prod-eks
+      environment: prod
+      project: fevm-event-tracking
+    secrets: inherit
