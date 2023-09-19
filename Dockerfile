@@ -1,13 +1,13 @@
-FROM golang:1.18.3-bullseye as builder
+FROM golang:1.20.8-bullseye as builder
 
 COPY . /opt
-RUN cd /opt && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/busi cmd/account/main.go
+RUN cd /opt && go build -o bin/fevm-event-tracking cmd/busi/main.go
 
-FROM alpine:3.15.4
-RUN mkdir -p /app/account-backend
-RUN adduser -h /app/account-backend -D starboard
+FROM debian:bullseye
+RUN apt update && apt-get install ca-certificates -y
+RUN adduser --gecos "Devops Starboard,Github,WorkPhone,HomePhone" --home /app/fevm-event-tracking --disabled-password starboard
 USER starboard
-COPY --from=builder /opt/bin/busi /app/account-backend/busi
+COPY --from=builder /opt/bin/fevm-event-tracking /app/fevm-event-tracking/fevm-event-tracking
 
-CMD ["--conf", "/app/account-backend/service.conf"]
-ENTRYPOINT ["/app/account-backend/busi"]
+CMD ["--conf", "/app/fevm-event-tracking/service.conf"]
+ENTRYPOINT ["/app/fevm-event-tracking/fevm-event-tracking"]
