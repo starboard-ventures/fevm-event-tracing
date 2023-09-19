@@ -9,18 +9,18 @@ info:
   title: starboard fevm event tracking job
   version: "1.0"
 paths:
-  /event:
+  /deal-proposal-create-event-tracking:
     post:
       consumes:
       - application/json
       - application/json
-      description: event cron job api, call by dolphin scheduler
+      description: event manual job api
       parameters:
       - in: query
-        name: maxHeight
+        name: from
         type: integer
       - in: query
-        name: minHeight
+        name: to
         type: integer
       produces:
       - application/json
@@ -31,7 +31,23 @@ paths:
           schema:
             type: integer
       tags:
-      - Inner
+      - Inner|manual
+  /deal-proposal-create-event-tracking-cron:
+    post:
+      consumes:
+      - application/json
+      - application/json
+      description: event cron job api, call by dolphin scheduler
+      produces:
+      - application/json
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+      tags:
+      - Inner|Cron
   /ping:
     get:
       consumes:

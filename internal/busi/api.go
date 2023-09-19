@@ -13,6 +13,14 @@ import (
 	"github.com/gin-contrib/cors"
 )
 
+func setTrancingConfig() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Set(v1.LOTUS0, utils.CNF.FevmEvent.Lotus)
+
+		c.Next()
+	}
+}
+
 func RegisterRoutes(r *gin.Engine) {
 	// r.Use(utils.Cors())
 	r.Use(cors.Default())
@@ -21,7 +29,8 @@ func RegisterRoutes(r *gin.Engine) {
 	apiv1 := r.Group("/api/v1")
 	{
 		apiv1.GET("/ping", v1.Ping)
-		r.POST("/event", v1.EventHandle)
+		apiv1.POST("/deal-proposal-create-event-tracking-cron", setTrancingConfig(), v1.DealProposalCreateEventCronHandle)
+		apiv1.POST("/deal-proposal-create-event-tracking", setTrancingConfig(), v1.DealProposalCreateEventHandle)
 	}
 }
 

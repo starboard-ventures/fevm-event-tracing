@@ -19,6 +19,6 @@ make # make to see help
 ### Run
     bin/fevm-event --conf conf/service.conf
 ### Useage
-    call api: /event[POST] without query paramters by dolphin scheduler per 60s.
+    Call api: /event-tracking[POST] without query paramters by dolphin scheduler per 60s.
 
-    if gap occurs, manually call /event without query parameters: /event?min_height=${min height}max_height=${max height}
+    If gap occurs, manually call /event with query parameters: /event?from=${min height}&to=${max height}

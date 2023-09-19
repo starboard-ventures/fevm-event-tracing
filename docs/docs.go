@@ -20,7 +20,43 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/event": {
+        "/deal-proposal-create-event-tracking": {
+            "post": {
+                "description": "event manual job api",
+                "consumes": [
+                    "application/json",
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json",
+                    "application/json"
+                ],
+                "tags": [
+                    "Inner|manual"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "to",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
+        },
+        "/deal-proposal-create-event-tracking-cron": {
             "post": {
                 "description": "event cron job api, call by dolphin scheduler",
                 "consumes": [
@@ -32,19 +68,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Inner"
-                ],
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "name": "maxHeight",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "name": "minHeight",
-                        "in": "query"
-                    }
+                    "Inner|Cron"
                 ],
                 "responses": {
                     "200": {

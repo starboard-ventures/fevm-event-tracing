@@ -76,6 +76,8 @@ const (
 	CodeNotFound
 	CodeUserNotFound
 	CodeForbidSendEmail
+
+	CodeEventHeightErr = 40003
 )
 
 var (
@@ -87,6 +89,7 @@ var (
 	ErrNotFound       = &Response{Code: CodeNotFound, Message: "object not found."}
 
 	// ErrAccountRegister              = &Response{Code: CodeAccountRegister, Message: ""}
+	ErrEventHeightErr = &Response{Code: CodeEventHeightErr, Message: "chain head is earlier than minimum height."}
 )
 
 type Gin struct {
