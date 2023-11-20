@@ -20,7 +20,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/deal-proposal-create-event-tracking": {
+        "/deal-proposal-create-event-tracing": {
             "post": {
                 "description": "event manual job api",
                 "consumes": [
@@ -56,7 +56,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/deal-proposal-create-event-tracking-cron": {
+        "/deal-proposal-create-event-tracing-cron": {
             "post": {
                 "description": "event cron job api, call by dolphin scheduler",
                 "consumes": [
@@ -119,8 +119,8 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "localhost:7001",
 	BasePath:         "/api/v1",
 	Schemes:          []string{},
-	Title:            "starboard fevm event tracking job",
-	Description:      "starboard event tracking job",
+	Title:            "starboard fevm event tracing job",
+	Description:      "starboard event tracing job",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 }

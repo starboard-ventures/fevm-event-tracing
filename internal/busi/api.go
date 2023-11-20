@@ -29,8 +29,8 @@ func RegisterRoutes(r *gin.Engine) {
 	apiv1 := r.Group("/api/v1")
 	{
 		apiv1.GET("/ping", v1.Ping)
-		apiv1.POST("/deal-proposal-create-event-tracking-cron", setTrancingConfig(), v1.DealProposalCreateEventCronHandle)
-		apiv1.POST("/deal-proposal-create-event-tracking", setTrancingConfig(), v1.DealProposalCreateEventHandle)
+		apiv1.POST("/deal-proposal-create-event-tracing-cron", setTrancingConfig(), v1.DealProposalCreateEventCronHandle)
+		apiv1.POST("/deal-proposal-create-event-tracing", setTrancingConfig(), v1.DealProposalCreateEventHandle)
 	}
 }
 

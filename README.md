@@ -19,6 +19,6 @@ make # make to see help
 ### Run
     bin/fevm-event --conf conf/service.conf
 ### Useage
-    Call api: /event-tracking[POST] without query paramters by dolphin scheduler per 60s.
+    Call api: /deal-proposal-create-event-tracing-cron[POST] without query paramters by dolphin scheduler every day.
 
-    If gap occurs, manually call /event with query parameters: /event?from=${min height}&to=${max height}
+    If gap occurs, manually call /deal-proposal-create-event-tracing with query parameters: /deal-proposal-create-event-tracing?from=${min height}&to=${max height}

@@ -1,8 +1,8 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "starboard event tracking job",
-        "title": "starboard fevm event tracking job",
+        "description": "starboard event tracing job",
+        "title": "starboard fevm event tracing job",
         "termsOfService": "http://swagger.io/terms/",
         "contact": {
             "name": "xueyouchen",
@@ -13,7 +13,7 @@
     "host": "localhost:7001",
     "basePath": "/api/v1",
     "paths": {
-        "/deal-proposal-create-event-tracking": {
+        "/deal-proposal-create-event-tracing": {
             "post": {
                 "description": "event manual job api",
                 "consumes": [
@@ -49,7 +49,7 @@
                 }
             }
         },
-        "/deal-proposal-create-event-tracking-cron": {
+        "/deal-proposal-create-event-tracing-cron": {
             "post": {
                 "description": "event cron job api, call by dolphin scheduler",
                 "consumes": [

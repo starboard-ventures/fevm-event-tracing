@@ -9,9 +9,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// @title starboard fevm event tracking job
+// @title starboard fevm event tracing job
 // @version 1.0
-// @description starboard event tracking job
+// @description starboard event tracing job
 // @termsOfService http://swagger.io/terms/
 
 // @contact.name xueyouchen
@@ -22,7 +22,7 @@ import (
 func NewRootCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "event",
-		Short: "event tracking",
+		Short: "event tracing",
 		Run: func(cmd *cobra.Command, args []string) {
 			if err := entry(); err != nil {
 				fmt.Fprintf(os.Stderr, "%v\n", err)

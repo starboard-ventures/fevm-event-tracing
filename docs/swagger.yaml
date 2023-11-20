@@ -4,12 +4,12 @@ info:
   contact:
     email: xueyou@starboardventures.io
     name: xueyouchen
-  description: starboard event tracking job
+  description: starboard event tracing job
   termsOfService: http://swagger.io/terms/
-  title: starboard fevm event tracking job
+  title: starboard fevm event tracing job
   version: "1.0"
 paths:
-  /deal-proposal-create-event-tracking:
+  /deal-proposal-create-event-tracing:
     post:
       consumes:
       - application/json
@@ -32,7 +32,7 @@ paths:
             type: integer
       tags:
       - Inner|Manual
-  /deal-proposal-create-event-tracking-cron:
+  /deal-proposal-create-event-tracing-cron:
     post:
       consumes:
       - application/json

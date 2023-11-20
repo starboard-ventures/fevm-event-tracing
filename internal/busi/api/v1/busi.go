@@ -14,7 +14,7 @@ import (
 // @Accept application/json,json
 // @Produce application/json,json
 // @Success 200 {object} utils.ResponseCode
-// @Router /deal-proposal-create-event-tracking-cron [post]
+// @Router /deal-proposal-create-event-tracing-cron [post]
 func DealProposalCreateEventCronHandle(c *gin.Context) {
 	app := utils.Gin{C: c}
 
@@ -37,7 +37,7 @@ func DealProposalCreateEventCronHandle(c *gin.Context) {
 // @Produce application/json,json
 // @Param RequestHeight query core.RequestHeight false "RequestHeight"
 // @Success 200 {object} utils.ResponseCode
-// @Router /deal-proposal-create-event-tracking [post]
+// @Router /deal-proposal-create-event-tracing [post]
 func DealProposalCreateEventHandle(c *gin.Context) {
 	app := utils.Gin{C: c}
 
