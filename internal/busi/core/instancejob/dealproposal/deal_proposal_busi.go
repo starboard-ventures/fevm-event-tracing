@@ -267,6 +267,3 @@ func lengthPrefixPointsTo(output []byte) (int, int, error) {
 
 	return int(boffset.Uint64()), int(lengthBig.Uint64()), nil
 }
-
-// case 2:
-// select * from evm_receipt where height bewteen xxx and xxx and logs like '%DealProposalCreateHash%' order by height desc;
