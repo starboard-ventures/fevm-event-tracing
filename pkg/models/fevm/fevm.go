@@ -18,7 +18,7 @@ type EventHeightCheckpoint struct {
 	Id                uint64 `json:"-" xorm:"bigserial pk autoincr"`
 	MaxRecordedHeight uint64 `xorm:"bigint notnull"`
 	EventHash         string `xorm:"varchar(255) index notnull"`
-	EventName         string `xorm:"varchar(255) index notnull default ''"`
+	EventName         string `xorm:"varchar(255)"`
 }
 
 // Receipt evm transaction receipt
