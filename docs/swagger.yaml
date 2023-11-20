@@ -14,7 +14,7 @@ paths:
       consumes:
       - application/json
       - application/json
-      description: event manual job api
+      description: deal-proposal-create's event manual job api
       parameters:
       - in: query
         name: from
@@ -37,7 +37,7 @@ paths:
       consumes:
       - application/json
       - application/json
-      description: event cron job api, call by dolphin scheduler
+      description: deal-proposal-create's event cron job api, call by dolphin scheduler
       produces:
       - application/json
       - application/json
@@ -68,4 +68,20 @@ paths:
             type: string
       tags:
       - Sys
+  /wfil-event-tracing-cron:
+    post:
+      consumes:
+      - application/json
+      - application/json
+      description: wfil's event cron job api, call by dolphin scheduler
+      produces:
+      - application/json
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+      tags:
+      - Inner|Cron
 swagger: "2.0"

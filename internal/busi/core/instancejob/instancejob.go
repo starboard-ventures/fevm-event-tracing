@@ -3,73 +3,79 @@ package instancejob
 import (
 	"context"
 	"errors"
-	"fmt"
-	"sync"
-	"time"
-
 	"event-trace/internal/busi/core/instancejob/dealproposal"
+	"event-trace/internal/busi/core/instancejob/wfil"
+	"fmt"
+	"time"
 
 	"github.com/filecoin-project/lotus/api"
 	log "github.com/sirupsen/logrus"
 )
 
-var insJob *job
-var once sync.Once
+var _ ExecuteJobFn = dealproposal.DealProposalCreate{}
+var _ ExecuteJobFn = wfil.Wfil{}
 
-type job struct {
-	jobIsRunning bool
-	startTime    time.Time
-	endTime      time.Time
-
-	executeJobFn dealproposal.DealProposalEventTracingCronFn
+type ExecuteJobFn interface {
+	EventTracing(context.Context, *api.FullNodeStruct, ...string) error
+	GetEventName() string
 }
 
-type CronJob struct {
-	node *api.FullNodeStruct
+var cronJob = CronJob{
+	jobs: make(map[string]*singletonJob),
+}
+
+type singletonJob struct {
+	jobIsRunning bool
+	node         *api.FullNodeStruct
+
+	startTime time.Time
+	endTime   time.Time
 
 	minHeight uint64
 	maxHeight uint64
 
-	*job
+	executeJobFn ExecuteJobFn
 }
 
-func NewCronJob(node *api.FullNodeStruct, minHeight, maxHeight uint64) *CronJob {
-	cj := &CronJob{
-		node: node,
+type CronJob struct {
+	node *api.FullNodeStruct
+	jobs map[string]*singletonJob
+}
 
-		minHeight: minHeight,
-		maxHeight: maxHeight,
+func NewCronJob(node *api.FullNodeStruct, minHeight, maxHeight uint64, fn ExecuteJobFn) *singletonJob {
+	eventName := fn.GetEventName()
+
+	if _, ok := cronJob.jobs[eventName]; !ok {
+		cronJob.jobs[eventName] = &singletonJob{
+			node:         node,
+			minHeight:    minHeight,
+			maxHeight:    maxHeight,
+			executeJobFn: fn,
+		}
 	}
-
-	once.Do(func() {
-		insJob = &job{}
-	})
-
-	cj.job = insJob
-
-	return cj
+	return cronJob.jobs[eventName]
 }
 
-func (cj *CronJob) TracingJobExecute(ctx context.Context, fn dealproposal.DealProposalEventTracingCronFn) error {
-	if cj.jobIsRunning {
-		str := fmt.Sprintf("The previous job has begun at the time: %v, pls wait for it finishes or ctrl^c it.", cj.startTime)
+func (j *singletonJob) TracingJobExecute(ctx context.Context, args ...string) error {
+	if j.jobIsRunning {
+		str := fmt.Sprintf("The previous job has begun at the time: %v, pls wait for it finishes or ctrl^c it.", j.startTime)
 		log.Infof(str)
 		return errors.New(str)
 	} else {
 		{
-			cj.jobIsRunning = true
-			cj.startTime = time.Now()
+			j.jobIsRunning = true
+			j.startTime = time.Now()
 
-			log.Infof("Job runs at time: %v, from: %v - to: %v", cj.startTime, cj.minHeight, cj.maxHeight)
+			log.Infof("Job runs at time: %v, from: %v - to: %v", j.startTime, j.minHeight, j.maxHeight)
 		}
 
 		defer func() {
-			cj.jobIsRunning = false
-			cj.endTime = time.Now()
+			j.jobIsRunning = false
+			j.endTime = time.Now()
 
-			log.Infof("Job has been finished: %v", cj.endTime)
+			log.Infof("Job has been finished: %v", j.endTime)
 		}()
 
-		return fn(ctx, cj.node)
+		return j.executeJobFn.EventTracing(ctx, j.node, args...)
 	}
 }

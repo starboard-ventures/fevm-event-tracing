@@ -4,12 +4,13 @@ import (
 	"event-trace/internal/busi/core"
 	"event-trace/pkg/utils"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
-// event cron job godoc
-// @Description event cron job api, call by dolphin scheduler
+// deal-proposal-create's event cron job godoc
+// @Description deal-proposal-create's event cron job api, call by dolphin scheduler
 // @Tags Inner|Cron
 // @Accept application/json,json
 // @Produce application/json,json
@@ -30,8 +31,8 @@ func DealProposalCreateEventCronHandle(c *gin.Context) {
 	app.HTTPResponseOK(nil)
 }
 
-// event manual job godoc
-// @Description event manual job api
+// deal-proposal-create's event manual job godoc
+// @Description deal-proposal-create's event manual job api
 // @Tags Inner|Manual
 // @Accept application/json,json
 // @Produce application/json,json
@@ -56,6 +57,31 @@ func DealProposalCreateEventHandle(c *gin.Context) {
 	r.Lotus0, _ = lotus0.(string)
 
 	resp := core.DealProposalCreateEventHandle(c.Request.Context(), &r)
+	if resp != nil {
+		app.HTTPResponse(http.StatusOK, resp.Response)
+		return
+	}
+
+	app.HTTPResponseOK(nil)
+}
+
+// wfil's event cron job godoc
+// @Description wfil's event cron job api, call by dolphin scheduler
+// @Tags Inner|Cron
+// @Accept application/json,json
+// @Produce application/json,json
+// @Success 200 {object} utils.ResponseCode
+// @Router /wfil-event-tracing-cron [post]
+func WfilEventCronHandle(c *gin.Context) {
+	app := utils.Gin{C: c}
+
+	lotus0, _ := c.Get(LOTUS0)
+	lotus0Cfg, _ := lotus0.(string)
+
+	wfil, _ := c.Get(WFIL)
+	wfilContract, _ := wfil.(string)
+
+	resp := core.WfilEventCronHandle(c.Request.Context(), lotus0Cfg, strings.ToLower(wfilContract))
 	if resp != nil {
 		app.HTTPResponse(http.StatusOK, resp.Response)
 		return

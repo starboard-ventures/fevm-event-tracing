@@ -1,10 +1,10 @@
 package busi
 
 import (
+	"context"
 	v1 "event-trace/internal/busi/api/v1"
 	"event-trace/pkg/models/fevm"
 	"event-trace/pkg/utils"
-	"context"
 
 	log "github.com/sirupsen/logrus"
 
@@ -13,9 +13,18 @@ import (
 	"github.com/gin-contrib/cors"
 )
 
-func setTrancingConfig() gin.HandlerFunc {
+func setDealProposalCreateTrancingConfig() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Set(v1.LOTUS0, utils.CNF.FevmEvent.Lotus)
+
+		c.Next()
+	}
+}
+
+func setWfilTrancingConfig() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Set(v1.LOTUS0, utils.CNF.FevmEvent.Lotus)
+		c.Set(v1.WFIL, utils.CNF.FevmEvent.WfilContract)
 
 		c.Next()
 	}
@@ -29,8 +38,14 @@ func RegisterRoutes(r *gin.Engine) {
 	apiv1 := r.Group("/api/v1")
 	{
 		apiv1.GET("/ping", v1.Ping)
-		apiv1.POST("/deal-proposal-create-event-tracing-cron", setTrancingConfig(), v1.DealProposalCreateEventCronHandle)
-		apiv1.POST("/deal-proposal-create-event-tracing", setTrancingConfig(), v1.DealProposalCreateEventHandle)
+		{
+			apiv1.POST("/deal-proposal-create-event-tracing-cron", setDealProposalCreateTrancingConfig(), v1.DealProposalCreateEventCronHandle)
+			apiv1.POST("/deal-proposal-create-event-tracing", setDealProposalCreateTrancingConfig(), v1.DealProposalCreateEventHandle)
+		}
+
+		{
+			apiv1.POST("/wfil-event-tracing-cron", setWfilTrancingConfig(), v1.WfilEventCronHandle)
+		}
 	}
 }
 

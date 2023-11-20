@@ -22,7 +22,7 @@ const docTemplate = `{
     "paths": {
         "/deal-proposal-create-event-tracing": {
             "post": {
-                "description": "event manual job api",
+                "description": "deal-proposal-create's event manual job api",
                 "consumes": [
                     "application/json",
                     "application/json"
@@ -58,7 +58,7 @@ const docTemplate = `{
         },
         "/deal-proposal-create-event-tracing-cron": {
             "post": {
-                "description": "event cron job api, call by dolphin scheduler",
+                "description": "deal-proposal-create's event cron job api, call by dolphin scheduler",
                 "consumes": [
                     "application/json",
                     "application/json"
@@ -105,6 +105,30 @@ const docTemplate = `{
                         "description": "error:...",
                         "schema": {
                             "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/wfil-event-tracing-cron": {
+            "post": {
+                "description": "wfil's event cron job api, call by dolphin scheduler",
+                "consumes": [
+                    "application/json",
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json",
+                    "application/json"
+                ],
+                "tags": [
+                    "Inner|Cron"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
                         }
                     }
                 }

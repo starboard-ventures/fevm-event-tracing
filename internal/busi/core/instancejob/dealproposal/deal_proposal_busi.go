@@ -18,15 +18,24 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type DealProposalEventTracingCronFn func(context.Context, *api.FullNodeStruct) error
+type DealProposalCreate struct {
+	EventName string
+}
 
-// 0xfd6419d07e4c269e58d0c63969756c2124155b4a8d6dd08b8cd46e3a9acbf625 is event - DealProposalCreate(bytes32,uint64,bool,uint256)'s hash
 const (
 	DealProposalCreateEventHash = "0xfd6419d07e4c269e58d0c63969756c2124155b4a8d6dd08b8cd46e3a9acbf625"
 	DealProposalCreateEventName = "DealProposalCreate(bytes32,uint64,bool,uint256)"
 )
 
-func TracingDealProposalEventCron(ctx context.Context, node *api.FullNodeStruct) error {
+func NewInstance() DealProposalCreate {
+	return DealProposalCreate{"DealProposalCreate"}
+}
+
+func (dpc DealProposalCreate) GetEventName() string {
+	return dpc.EventName
+}
+
+func (dpc DealProposalCreate) EventTracing(ctx context.Context, node *api.FullNodeStruct, args ...string) error {
 	var (
 		maxHeightEvmReceipt fevm.EVMReceipt
 		recordedHeight      fevm.EventHeightCheckpoint
@@ -84,7 +93,7 @@ func TracingDealProposalEventCron(ctx context.Context, node *api.FullNodeStruct)
 				log.Errorf("parsing `from` eth address failed: %v", err)
 				continue
 			}
-			res, err := getDealProposal(ctx, node, receipt.To, ethLog.Topics[1].String(), fromEthAddr)
+			res, err := dpc.getDealProposal(ctx, node, receipt.To, ethLog.Topics[1].String(), fromEthAddr)
 			if err != nil {
 				log.Errorf("eth call for deal proposal failed: %v", err)
 				continue
@@ -120,7 +129,7 @@ func TracingDealProposalEventCron(ctx context.Context, node *api.FullNodeStruct)
 	return nil
 }
 
-func TracingDealProposalEvent(ctx context.Context, node *api.FullNodeStruct, minHeight, maxHeight uint64) error {
+func (dpc DealProposalCreate) TracingDealProposalEvent(ctx context.Context, node *api.FullNodeStruct, minHeight, maxHeight uint64) error {
 	evmReceipts := make([]*fevm.EVMReceipt, 0)
 
 	if err := utils.X.Where("height between ? and ? and logs like ?", minHeight, maxHeight, "%"+DealProposalCreateEventHash+"%").Asc("height").Find(&evmReceipts); err != nil {
@@ -158,7 +167,7 @@ func TracingDealProposalEvent(ctx context.Context, node *api.FullNodeStruct, min
 				log.Errorf("parsing `from` eth address failed: %v", err)
 				continue
 			}
-			res, err := getDealProposal(ctx, node, receipt.To, ethLog.Topics[1].String(), fromEthAddr)
+			res, err := dpc.getDealProposal(ctx, node, receipt.To, ethLog.Topics[1].String(), fromEthAddr)
 			if err != nil {
 				log.Errorf("eth call for deal proposal failed: %v", err)
 				continue
@@ -184,7 +193,7 @@ func TracingDealProposalEvent(ctx context.Context, node *api.FullNodeStruct, min
 }
 
 // refer - https://github.com/filecoin-project/boost/blob/main/storagemarket/contract_deal_monitor.go#L27
-func getDealProposal(ctx context.Context, node *api.FullNodeStruct, topicContractAddress string, topicDealProposalID string, fromEthAddr ethtypes.EthAddress) ([]byte, error) {
+func (dpc DealProposalCreate) getDealProposal(ctx context.Context, node *api.FullNodeStruct, topicContractAddress string, topicDealProposalID string, fromEthAddr ethtypes.EthAddress) ([]byte, error) {
 	// GetDealProposal is a free data retrieval call binding the contract method 0xf4b2e4d8.
 	_params := "0xf4b2e4d8" + topicDealProposalID[2:] // cut 0x prefix
 
@@ -212,7 +221,7 @@ func getDealProposal(ctx context.Context, node *api.FullNodeStruct, topicContrac
 		return nil, fmt.Errorf("eth call erred: %w", err)
 	}
 
-	begin, length, err := lengthPrefixPointsTo(res)
+	begin, length, err := dpc.lengthPrefixPointsTo(res)
 	if err != nil {
 		return nil, fmt.Errorf("length prefix points erred: %w", err)
 	}
@@ -220,7 +229,7 @@ func getDealProposal(ctx context.Context, node *api.FullNodeStruct, topicContrac
 	return res[begin : begin+length], nil
 }
 
-func lengthPrefixPointsTo(output []byte) (int, int, error) {
+func (dpc DealProposalCreate) lengthPrefixPointsTo(output []byte) (int, int, error) {
 	index := 0
 	boffset := mbig.NewInt(0).SetBytes(output[index : index+32])
 	boffset.Add(boffset, mbig.NewInt(32))
