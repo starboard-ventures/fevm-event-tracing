@@ -1,7 +1,7 @@
 package busi
 
 import (
-	_ "busi/docs"
+	_ "event-trace/docs"
 
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"

@@ -1,9 +1,9 @@
 package core
 
 import (
-	"busi/internal/busi/core/instancejob"
-	"busi/internal/busi/core/instancejob/dealproposal"
-	"busi/pkg/utils"
+	"event-trace/internal/busi/core/instancejob"
+	"event-trace/internal/busi/core/instancejob/dealproposal"
+	"event-trace/pkg/utils"
 	"context"
 	"net/http"
 )

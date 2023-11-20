@@ -1,9 +1,9 @@
 package busi
 
 import (
-	v1 "busi/internal/busi/api/v1"
-	"busi/pkg/models/fevm"
-	"busi/pkg/utils"
+	v1 "event-trace/internal/busi/api/v1"
+	"event-trace/pkg/models/fevm"
+	"event-trace/pkg/utils"
 	"context"
 
 	log "github.com/sirupsen/logrus"

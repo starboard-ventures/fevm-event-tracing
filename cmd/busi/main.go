@@ -1,7 +1,7 @@
 package main
 
 import (
-	"busi/internal/busi"
+	"event-trace/internal/busi"
 
 	"fmt"
 	"os"

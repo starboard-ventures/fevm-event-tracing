@@ -31,7 +31,7 @@ paths:
           schema:
             type: integer
       tags:
-      - Inner|manual
+      - Inner|Manual
   /deal-proposal-create-event-tracking-cron:
     post:
       consumes:

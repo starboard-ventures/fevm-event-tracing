@@ -1,8 +1,8 @@
 package v1
 
 import (
-	"busi/internal/busi/core"
-	"busi/pkg/utils"
+	"event-trace/internal/busi/core"
+	"event-trace/pkg/utils"
 	"net/http"
 
 	"github.com/gin-gonic/gin"

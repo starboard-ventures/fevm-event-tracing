@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"busi/pkg/utils"
+	"event-trace/pkg/utils"
 
 	"github.com/gin-gonic/gin"
 )

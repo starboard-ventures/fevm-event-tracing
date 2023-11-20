@@ -32,7 +32,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Inner|manual"
+                    "Inner|Manual"
                 ],
                 "parameters": [
                     {

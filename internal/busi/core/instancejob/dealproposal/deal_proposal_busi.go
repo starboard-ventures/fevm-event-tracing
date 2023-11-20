@@ -1,11 +1,12 @@
 package dealproposal
 
 import (
-	"busi/pkg/models/fevm"
-	"busi/pkg/utils"
 	"bytes"
 	"context"
 	"encoding/json"
+	"event-trace/internal/busi/core/instancejob/common"
+	"event-trace/pkg/models/fevm"
+	"event-trace/pkg/utils"
 	"fmt"
 
 	"github.com/filecoin-project/go-state-types/builtin/v9/market"
@@ -105,14 +106,14 @@ func TracingDealProposalEventCron(ctx context.Context, node *api.FullNodeStruct)
 
 			// update or insert event_height_checkoutpoint
 			recordedHeight.MaxRecordedHeight = uint64(receipt.Height)
-			if err := updateEventHeightCheckoutpoint(ctx, &recordedHeight); err != nil {
+			if err := common.UpdateEventHeightCheckoutpoint(ctx, &recordedHeight); err != nil {
 				return err
 			}
 		}
 	}
 
 	recordedHeight.MaxRecordedHeight = uint64(maxHeightEvmReceipt.Height)
-	if err := updateEventHeightCheckoutpoint(ctx, &recordedHeight); err != nil {
+	if err := common.UpdateEventHeightCheckoutpoint(ctx, &recordedHeight); err != nil {
 		return err
 	}
 
@@ -176,24 +177,6 @@ func TracingDealProposalEvent(ctx context.Context, node *api.FullNodeStruct, min
 				log.Errorf("execute sql error: %v", err)
 				return err
 			}
-		}
-	}
-
-	return nil
-}
-
-func updateEventHeightCheckoutpoint(ctx context.Context, ec *fevm.EventHeightCheckpoint) error {
-	b, err := utils.X.ID(ec.Id).Update(ec)
-	if err != nil {
-		log.Errorf("execute sql error: %v", err)
-		return err
-	}
-
-	if b == 0 { // there aren't any records in the table
-		_, err = utils.X.InsertOne(ec)
-		if err != nil {
-			log.Errorf("execute sql error: %v", err)
-			return err
 		}
 	}
 

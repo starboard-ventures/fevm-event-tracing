@@ -1,6 +1,6 @@
-module busi
+module event-trace
 
-go 1.18
+go 1.20
 
 require (
 	github.com/filecoin-project/go-jsonrpc v0.3.1
