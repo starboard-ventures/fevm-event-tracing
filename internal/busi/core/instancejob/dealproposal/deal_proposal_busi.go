@@ -17,7 +17,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type DealProposalTracingCronFn func(context.Context, *api.FullNodeStruct) error
+type DealProposalEventTracingCronFn func(context.Context, *api.FullNodeStruct) error
 
 // 0xfd6419d07e4c269e58d0c63969756c2124155b4a8d6dd08b8cd46e3a9acbf625 is event - DealProposalCreate(bytes32,uint64,bool,uint256)'s hash
 const (
@@ -31,6 +31,9 @@ func TracingDealProposalEventCron(ctx context.Context, node *api.FullNodeStruct)
 		recordedHeight      fevm.EventHeightCheckpoint
 	)
 	evmReceipts := make([]*fevm.EVMReceipt, 0)
+
+	recordedHeight.EventHash = DealProposalCreateEventHash
+	recordedHeight.EventName = DealProposalCreateEventName
 
 	// select * from event_height_checkpoint where event_hash = DealProposalCreateHash;
 	// select max(height) from evm_receipt;
@@ -102,18 +105,15 @@ func TracingDealProposalEventCron(ctx context.Context, node *api.FullNodeStruct)
 
 			// update or insert event_height_checkoutpoint
 			recordedHeight.MaxRecordedHeight = uint64(receipt.Height)
-			recordedHeight.EventHash = DealProposalCreateEventHash
 			if err := updateEventHeightCheckoutpoint(ctx, &recordedHeight); err != nil {
 				return err
 			}
 		}
 	}
 
-	if len(evmReceipts) != 0 {
-		recordedHeight.MaxRecordedHeight = uint64(evmReceipts[len(evmReceipts)-1].Height)
-		if err := updateEventHeightCheckoutpoint(ctx, &recordedHeight); err != nil {
-			return err
-		}
+	recordedHeight.MaxRecordedHeight = uint64(maxHeightEvmReceipt.Height)
+	if err := updateEventHeightCheckoutpoint(ctx, &recordedHeight); err != nil {
+		return err
 	}
 
 	return nil

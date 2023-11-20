@@ -21,7 +21,7 @@ type job struct {
 	startTime    time.Time
 	endTime      time.Time
 
-	executeJobFn dealproposal.DealProposalTracingCronFn
+	executeJobFn dealproposal.DealProposalEventTracingCronFn
 }
 
 type CronJob struct {
@@ -50,7 +50,7 @@ func NewCronJob(node *api.FullNodeStruct, minHeight, maxHeight uint64) *CronJob 
 	return cj
 }
 
-func (cj *CronJob) TracingJobExecute(ctx context.Context, fn dealproposal.DealProposalTracingCronFn) error {
+func (cj *CronJob) TracingJobExecute(ctx context.Context, fn dealproposal.DealProposalEventTracingCronFn) error {
 	if cj.jobIsRunning {
 		str := fmt.Sprintf("The previous job has begun at the time: %v, pls wait for it finishes or ctrl^c it.", cj.startTime)
 		log.Infof(str)
