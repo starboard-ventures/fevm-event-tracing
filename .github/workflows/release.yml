@@ -12,7 +12,7 @@ jobs:
     with:
       aws_region: us-east-2
       environment: prod
-      image_repo_project: fevm-event-tracking
+      image_repo_project: fevm-event-tracing
     secrets: inherit
 
   Deploy_to_prod:
@@ -26,5 +26,5 @@ jobs:
       aws_account_repository: 129862287110
       eks_cluster_name: starboard-prod-prod-eks
       environment: prod
-      project: fevm-event-tracking
+      project: fevm-event-tracing
     secrets: inherit

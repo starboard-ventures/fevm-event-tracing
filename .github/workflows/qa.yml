@@ -12,7 +12,7 @@ jobs:
     with:
       aws_region: us-east-2
       environment: test
-      image_repo_project: fevm-event-tracking
+      image_repo_project: fevm-event-tracing
     secrets: inherit
 
   Deploy_to_test:
@@ -26,5 +26,5 @@ jobs:
       aws_region: us-east-2
       aws_account_repository: 129862287110
       environment: test
-      project: fevm-event-tracking
+      project: fevm-event-tracing
     secrets: inherit
