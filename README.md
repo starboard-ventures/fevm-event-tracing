@@ -19,6 +19,12 @@ make # make to see help
 ### Run
     bin/fevm-event --conf conf/service.conf
 ### Useage
-    Call api: /deal-proposal-create-event-tracing-cron[POST] without query paramters by dolphin scheduler every day.
+    Call APIs: 
+     - /api/v1/deal-proposal-create-event-tracing-cron[POST]
+     - /wfil-event-tracing-cron[POST]
+    without query paramters by dolphin scheduler every day.
 
-    If gap occurs, manually call /deal-proposal-create-event-tracing with query parameters: /deal-proposal-create-event-tracing?from=${min height}&to=${max height}
+
+    The gap APIs couldn't backfill the gap information deal to the DB schema has not a unique index.
+    - /api/v1/deal-proposal-create-event-tracing
+    - /api/v1/wfil-event-tracing
