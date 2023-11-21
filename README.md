@@ -21,7 +21,7 @@ make # make to see help
 ### Useage
     Call APIs: 
      - /api/v1/deal-proposal-create-event-tracing-cron[POST]
-     - /wfil-event-tracing-cron[POST]
+     - /api/v1//wfil-event-tracing-cron[POST]
     without query paramters by dolphin scheduler every day.
 
 
