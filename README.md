@@ -26,5 +26,5 @@ make # make to see help
 
 
     The gap APIs couldn't backfill the gap information deal to the DB schema has not a unique index.
-    - /api/v1/deal-proposal-create-event-tracing
-    - /api/v1/wfil-event-tracing
+     - /api/v1/deal-proposal-create-event-tracing
+     - /api/v1/wfil-event-tracing
