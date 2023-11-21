@@ -6,7 +6,8 @@ type RequestHeight struct {
 	MinHeight uint64 `form:"from" json:"from"`
 	MaxHeight uint64 `form:"to" json:"to"`
 
-	Lotus0 string `form:"-" json:"-"`
+	Lotus0       string `form:"-" json:"-"`
+	WfilContract string `form:"-" json:"-"`
 }
 
 func (r *RequestHeight) Validate() error {

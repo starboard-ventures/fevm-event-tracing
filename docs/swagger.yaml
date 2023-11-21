@@ -68,6 +68,29 @@ paths:
             type: string
       tags:
       - Sys
+  /wfil-event-tracing:
+    post:
+      consumes:
+      - application/json
+      - application/json
+      description: wfil's event manual job api
+      parameters:
+      - in: query
+        name: from
+        type: integer
+      - in: query
+        name: to
+        type: integer
+      produces:
+      - application/json
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+      tags:
+      - Inner|Manual
   /wfil-event-tracing-cron:
     post:
       consumes:

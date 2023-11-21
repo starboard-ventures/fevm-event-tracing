@@ -45,6 +45,7 @@ func RegisterRoutes(r *gin.Engine) {
 
 		{
 			apiv1.POST("/wfil-event-tracing-cron", setWfilTrancingConfig(), v1.WfilEventCronHandle)
+			apiv1.POST("/wfil-event-tracing", setWfilTrancingConfig(), v1.WfilEventHandle)
 		}
 	}
 }

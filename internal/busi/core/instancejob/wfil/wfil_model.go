@@ -1,6 +1,6 @@
 package wfil
 
-//https://github.com/glifio/wfil
+// https://github.com/glifio/wfil
 
 type Deposit struct {
 	From   string

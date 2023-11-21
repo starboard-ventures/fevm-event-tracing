@@ -30,25 +30,25 @@ func NewInstance() Wfil {
 	return Wfil{"Wfil"}
 }
 
-func (dpc Wfil) GetEventName() string {
-	return dpc.EventName
+func (wfil Wfil) GetEventName() string {
+	return wfil.EventName
 }
 
-func (dpc Wfil) EventTracing(ctx context.Context, node *api.FullNodeStruct, args ...string) error {
+func (wfil Wfil) EventTracing(ctx context.Context, node *api.FullNodeStruct, args ...string) error {
 	g, ctx := errgroup.WithContext(ctx)
 
 	g.Go(func() error {
-		return dpc.tracingWfilEventCron(ctx, node, args[0], WfilDepositEventHash, WfilDepositEventName)
+		return wfil.tracingWfilEventCron(ctx, node, args[0], WfilDepositEventHash, WfilDepositEventName)
 	})
 
 	g.Go(func() error {
-		return dpc.tracingWfilEventCron(ctx, node, args[0], WfilWithdrawalEventHash, WfilWithdrawalEventName)
+		return wfil.tracingWfilEventCron(ctx, node, args[0], WfilWithdrawalEventHash, WfilWithdrawalEventName)
 	})
 
 	return g.Wait()
 }
 
-func (dpc Wfil) tracingWfilEventCron(ctx context.Context, _ *api.FullNodeStruct, wfilAddress, eventHash, eventName string) error {
+func (wfil Wfil) tracingWfilEventCron(ctx context.Context, _ *api.FullNodeStruct, wfilAddress, eventHash, eventName string) error {
 	var (
 		maxHeightEvmReceipt fevm.EVMReceipt
 		recordedHeight      fevm.EventHeightCheckpoint
@@ -100,7 +100,7 @@ func (dpc Wfil) tracingWfilEventCron(ctx context.Context, _ *api.FullNodeStruct,
 				EventName:       eventName,
 			}
 
-			fevmEvent.Note = dpc.getTheEventContent(eventName, ethLog.Topics[1].String(), ethLog.Data.String())
+			fevmEvent.Note = wfil.getTheEventContent(eventName, ethLog.Topics[1].String(), ethLog.Data.String())
 
 			if _, err := utils.X.Insert(&fevmEvent); err != nil {
 				log.Errorf("execute sql error: %v", err)
@@ -123,7 +123,7 @@ func (dpc Wfil) tracingWfilEventCron(ctx context.Context, _ *api.FullNodeStruct,
 	return nil
 }
 
-func (dpc Wfil) getTheEventContent(eventName string, eventIndex, eventData string) string {
+func (wfil Wfil) getTheEventContent(eventName string, eventIndex, eventData string) string {
 	switch eventName {
 	case WfilDepositEventName:
 		deposit := Deposit{
@@ -143,4 +143,62 @@ func (dpc Wfil) getTheEventContent(eventName string, eventIndex, eventData strin
 		return string(data)
 	}
 	return ""
+}
+
+func (wfil Wfil) tracingWfilEvent(ctx context.Context, _ *api.FullNodeStruct, wfilAddress, eventHash, eventName string, minHeight, maxHeight uint64) error {
+	evmReceipts := make([]*fevm.EVMReceipt, 0)
+
+	if err := utils.X.Where("height between ? and ? and \"to\" = ? and logs like ?", minHeight, maxHeight, wfilAddress, "%"+eventHash+"%").Asc("height").Find(&evmReceipts); err != nil {
+		log.Errorf("execute sql error: %v", err)
+		return err
+	}
+
+	for _, receipt := range evmReceipts {
+		logs := make([]ethtypes.EthLog, 0)
+		if err := json.Unmarshal([]byte(receipt.Logs), &logs); err != nil {
+			log.Warnf("Unmarshal receipt[height: %v] log err: %v", receipt.Height, err)
+			continue
+		}
+
+		for _, ethLog := range logs {
+			if ethLog.Topics[0].String() != eventHash {
+				continue
+			}
+
+			fevmEvent := fevm.FevmEvent{
+				Height:          uint64(receipt.Height),
+				TransactionHash: receipt.TransactionHash,
+				From:            receipt.From,
+				To:              receipt.To,
+				Status:          receipt.Status,
+				LogsBloom:       receipt.LogsBloom,
+				Logs:            receipt.Logs,
+				EventHash:       ethLog.Topics[0].String(),
+				EventName:       eventName,
+			}
+
+			fevmEvent.Note = wfil.getTheEventContent(eventName, ethLog.Topics[1].String(), ethLog.Data.String())
+
+			if _, err := utils.X.Insert(&fevmEvent); err != nil {
+				log.Errorf("execute sql error: %v", err)
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+func (wfil Wfil) TracingWfilEvent(ctx context.Context, _ *api.FullNodeStruct, minHeight, maxHeight uint64, wfilAddress string) error {
+	g, ctx := errgroup.WithContext(ctx)
+
+	g.Go(func() error {
+		return wfil.tracingWfilEvent(ctx, nil, wfilAddress, WfilDepositEventHash, WfilDepositEventName, minHeight, maxHeight)
+	})
+
+	g.Go(func() error {
+		return wfil.tracingWfilEvent(ctx, nil, wfilAddress, WfilWithdrawalEventHash, WfilWithdrawalEventName, minHeight, maxHeight)
+	})
+
+	return g.Wait()
 }

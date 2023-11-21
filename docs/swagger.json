@@ -103,6 +103,42 @@
                 }
             }
         },
+        "/wfil-event-tracing": {
+            "post": {
+                "description": "wfil's event manual job api",
+                "consumes": [
+                    "application/json",
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json",
+                    "application/json"
+                ],
+                "tags": [
+                    "Inner|Manual"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "to",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
+        },
         "/wfil-event-tracing-cron": {
             "post": {
                 "description": "wfil's event cron job api, call by dolphin scheduler",
