@@ -1,5 +1,7 @@
 package fevm
 
+import "time"
+
 type FevmEvent struct {
 	Id              uint64 `json:"-" xorm:"bigserial pk autoincr"`
 	Height          uint64 `xorm:"bigint notnull"`
@@ -14,19 +16,12 @@ type FevmEvent struct {
 	Note            string `xorm:"text"`
 }
 
-func (f *FevmEvent) TableName() string {
-	return "fevm_event_test"
-}
-
 type EventHeightCheckpoint struct {
-	Id                uint64 `json:"-" xorm:"bigserial pk autoincr"`
-	MaxRecordedHeight uint64 `xorm:"bigint notnull"`
-	EventHash         string `xorm:"varchar(255) index notnull"`
-	EventName         string `xorm:"varchar(255)"`
-}
-
-func (e *EventHeightCheckpoint) TableName() string {
-	return "event_height_checkpoint_test"
+	Id                uint64    `json:"-" xorm:"bigserial pk autoincr"`
+	MaxRecordedHeight uint64    `xorm:"bigint notnull"`
+	EventHash         string    `xorm:"varchar(255) index notnull"`
+	EventName         string    `xorm:"varchar(255)"`
+	UpdatedAt         time.Time `xorm:"updated"`
 }
 
 // Receipt evm transaction receipt

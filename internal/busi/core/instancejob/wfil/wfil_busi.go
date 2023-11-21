@@ -48,7 +48,7 @@ func (dpc Wfil) EventTracing(ctx context.Context, node *api.FullNodeStruct, args
 	return g.Wait()
 }
 
-func (dpc Wfil) tracingWfilEventCron(ctx context.Context, node *api.FullNodeStruct, wfilAddress, eventHash, eventName string) error {
+func (dpc Wfil) tracingWfilEventCron(ctx context.Context, _ *api.FullNodeStruct, wfilAddress, eventHash, eventName string) error {
 	var (
 		maxHeightEvmReceipt fevm.EVMReceipt
 		recordedHeight      fevm.EventHeightCheckpoint
@@ -100,6 +100,8 @@ func (dpc Wfil) tracingWfilEventCron(ctx context.Context, node *api.FullNodeStru
 				EventName:       eventName,
 			}
 
+			fevmEvent.Note = dpc.getTheEventContent(eventName, ethLog.Topics[1].String(), ethLog.Data.String())
+
 			if _, err := utils.X.Insert(&fevmEvent); err != nil {
 				log.Errorf("execute sql error: %v", err)
 				return err
@@ -119,4 +121,26 @@ func (dpc Wfil) tracingWfilEventCron(ctx context.Context, node *api.FullNodeStru
 	}
 
 	return nil
+}
+
+func (dpc Wfil) getTheEventContent(eventName string, eventIndex, eventData string) string {
+	switch eventName {
+	case WfilDepositEventName:
+		deposit := Deposit{
+			From:   eventIndex,
+			Amount: eventData,
+		}
+
+		data, _ := json.Marshal(deposit)
+		return string(data)
+	case WfilWithdrawalEventName:
+		withdrawal := Withdrawal{
+			To:     eventIndex,
+			Amount: eventData,
+		}
+
+		data, _ := json.Marshal(withdrawal)
+		return string(data)
+	}
+	return ""
 }
