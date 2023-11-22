@@ -1,4 +1,4 @@
-FROM golang:1.20.8-bullseye as builder
+FROM golang:1.21.4-bullseye as builder
 
 COPY . /opt
 RUN cd /opt && go build -o bin/fevm-event-tracing cmd/busi/main.go
