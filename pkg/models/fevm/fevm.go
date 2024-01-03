@@ -4,6 +4,7 @@ import "time"
 
 type FevmEvent struct {
 	Id              uint64 `json:"-" xorm:"bigserial pk autoincr"`
+	ContractAddress string `xorm:"varchar(255) index notnull default ''"`
 	Height          uint64 `xorm:"bigint notnull"`
 	TransactionHash string `xorm:"varchar(255) notnull pk"`
 	From            string `xorm:"varchar(255) index notnull default ''"`
@@ -21,6 +22,7 @@ type EventHeightCheckpoint struct {
 	MaxRecordedHeight uint64    `xorm:"bigint notnull"`
 	EventHash         string    `xorm:"varchar(255) index notnull"`
 	EventName         string    `xorm:"varchar(255)"`
+	Type              uint8     `xorm:"smallint index comment('0 - transaction, 1 - internal transaction')"`
 	UpdatedAt         time.Time `xorm:"updated"`
 }
 
@@ -46,4 +48,22 @@ type EVMReceipt struct {
 
 func (r *EVMReceipt) TableName() string {
 	return "evm_receipt"
+}
+
+// InternalTX contract internal transaction
+type EVMInternalTXN struct {
+	Height           int64  `json:"height"`
+	Version          int    `json:"version"`
+	ParentHash       string `json:"parent_hash"`
+	ParentMessageCid string `json:"parent_message_cid"`
+	Type             uint64 `json:"type"`
+	From             string `json:"from"`
+	To               string `json:"to"`
+	Value            string `json:"value"`
+	Params           string `json:"params"`
+	ParamsCodec      uint64 `json:"params_codec"`
+}
+
+func (r *EVMInternalTXN) TableName() string {
+	return "evm_internal_tx"
 }

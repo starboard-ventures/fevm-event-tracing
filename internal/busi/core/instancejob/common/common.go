@@ -9,7 +9,7 @@ import (
 )
 
 func UpdateEventHeightCheckoutpoint(ctx context.Context, ec *fevm.EventHeightCheckpoint) error {
-	b, err := utils.X.ID(ec.Id).Update(ec)
+	b, err := utils.X.ID(ec.Id).MustCols("type").Update(ec)
 	if err != nil {
 		log.Errorf("execute sql error: %v", err)
 		return err

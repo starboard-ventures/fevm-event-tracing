@@ -24,6 +24,9 @@ const (
 
 	WfilWithdrawalEventHash = "0x7fcf532c15f0a6db0bd6d0e038bea71d30d808c7d98cb3bf7268a95bf5081b65"
 	WfilWithdrawalEventName = "Withdrawal(address,uint256)"
+
+	TxnType         = 0
+	InternalTXNType = 1
 )
 
 func NewInstance() Wfil {
@@ -37,18 +40,121 @@ func (wfil Wfil) GetEventName() string {
 func (wfil Wfil) EventTracing(ctx context.Context, node *api.FullNodeStruct, args ...string) error {
 	g, ctx := errgroup.WithContext(ctx)
 
+	// EOA -> wfil contract
 	g.Go(func() error {
-		return wfil.tracingWfilEventCron(ctx, node, args[0], WfilDepositEventHash, WfilDepositEventName)
+		return wfil.tracingWfilEventTXNCron(ctx, node, args[0], WfilDepositEventHash, WfilDepositEventName)
 	})
 
 	g.Go(func() error {
-		return wfil.tracingWfilEventCron(ctx, node, args[0], WfilWithdrawalEventHash, WfilWithdrawalEventName)
+		return wfil.tracingWfilEventTXNCron(ctx, node, args[0], WfilWithdrawalEventHash, WfilWithdrawalEventName)
+	})
+
+	// CA -> wfil contract
+	g.Go(func() error {
+		return wfil.tracingWfilEventCronInInternalTXN(ctx, node, args[0], WfilDepositEventHash, WfilDepositEventName)
+	})
+
+	g.Go(func() error {
+		return wfil.tracingWfilEventCronInInternalTXN(ctx, node, args[0], WfilWithdrawalEventHash, WfilWithdrawalEventName)
 	})
 
 	return g.Wait()
 }
 
-func (wfil Wfil) tracingWfilEventCron(ctx context.Context, _ *api.FullNodeStruct, wfilAddress, eventHash, eventName string) error {
+// CA -> wfil contract(EOA -> middle contracts -> wfil contract)
+func (wfil Wfil) tracingWfilEventCronInInternalTXN(ctx context.Context, _ *api.FullNodeStruct, wfilAddress, eventHash, eventName string) error {
+	var (
+		maxHeightEvmReceipt fevm.EVMReceipt
+		recordedHeight      fevm.EventHeightCheckpoint
+	)
+	evmInternalTxn := make([]*fevm.EVMInternalTXN, 0)
+
+	recordedHeight.EventHash = eventHash
+	recordedHeight.EventName = eventName
+	recordedHeight.Type = InternalTXNType
+
+	if _, err := utils.X.Where("event_hash = ? and type = ?", eventHash, InternalTXNType).Get(&recordedHeight); err != nil {
+		log.Errorf("execute sql error: %v", err)
+		return err
+	}
+
+	if _, err := utils.X.Select("max(height) as height").Get(&maxHeightEvmReceipt); err != nil {
+		log.Errorf("execute sql error: %v", err)
+		return err
+	}
+
+	if err := utils.X.Where("height between ? and ? and \"to\" = ?", recordedHeight.MaxRecordedHeight+1, maxHeightEvmReceipt.Height+1, wfilAddress).Asc("height").Find(&evmInternalTxn); err != nil {
+		log.Errorf("execute sql error: %v", err)
+		return err
+	}
+
+	for _, internalTXN := range evmInternalTxn {
+		var (
+			b          bool
+			err        error
+			receiptTmp fevm.EVMReceipt
+		)
+
+		b, err = utils.X.Where("height = ? and transaction_hash = ?", internalTXN.Height, internalTXN.ParentHash).Get(&receiptTmp)
+		if err != nil {
+			log.Errorf("execute sql error: %v", err)
+			return err
+		}
+
+		if !b {
+			log.Warnf("can't find internal transaction's transaction, height: %v, hash: %v", internalTXN.Height, internalTXN.ParentHash)
+			continue
+		}
+
+		logs := make([]ethtypes.EthLog, 0)
+		if err := json.Unmarshal([]byte(receiptTmp.Logs), &logs); err != nil {
+			log.Warnf("Unmarshal receipt[height: %v] log err: %v", receiptTmp.Height, err)
+			continue
+		}
+
+		for _, ethLog := range logs {
+			if ethLog.Topics[0].String() != eventHash {
+				continue
+			}
+
+			fevmEvent := fevm.FevmEvent{
+				ContractAddress: wfilAddress,
+				Height:          uint64(receiptTmp.Height),
+				TransactionHash: receiptTmp.TransactionHash,
+				From:            receiptTmp.From,
+				To:              receiptTmp.To,
+				Status:          receiptTmp.Status,
+				LogsBloom:       receiptTmp.LogsBloom,
+				Logs:            receiptTmp.Logs,
+				EventHash:       ethLog.Topics[0].String(),
+				EventName:       eventName,
+			}
+
+			fevmEvent.Note = wfil.getTheEventContent(eventName, ethLog.Topics[1].String(), ethLog.Data.String())
+
+			if _, err := utils.X.Insert(&fevmEvent); err != nil {
+				log.Errorf("execute sql error: %v", err)
+				return err
+			}
+
+			// update or insert event_height_checkoutpoint
+			recordedHeight.MaxRecordedHeight = uint64(receiptTmp.Height)
+			if err := common.UpdateEventHeightCheckoutpoint(ctx, &recordedHeight); err != nil {
+				return err
+			}
+		}
+	}
+
+	recordedHeight.MaxRecordedHeight = uint64(maxHeightEvmReceipt.Height)
+	if err := common.UpdateEventHeightCheckoutpoint(ctx, &recordedHeight); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// EOA -> wfil contract
+func (wfil Wfil) tracingWfilEventTXNCron(ctx context.Context, _ *api.FullNodeStruct, wfilAddress, eventHash, eventName string) error {
 	var (
 		maxHeightEvmReceipt fevm.EVMReceipt
 		recordedHeight      fevm.EventHeightCheckpoint
@@ -57,11 +163,12 @@ func (wfil Wfil) tracingWfilEventCron(ctx context.Context, _ *api.FullNodeStruct
 
 	recordedHeight.EventHash = eventHash
 	recordedHeight.EventName = eventName
+	recordedHeight.Type = TxnType
 
 	// select * from event_height_checkpoint where event_hash = %eventHash%;
 	// select max(height) from evm_receipt;
 	// select * from evm_receipt where height > leftHeight and height < rightHeight and logs like '%eventHash%' order by height desc;
-	if _, err := utils.X.Where("event_hash = ?", eventHash).Get(&recordedHeight); err != nil {
+	if _, err := utils.X.Where("event_hash = ? and type = ?", eventHash, TxnType).Get(&recordedHeight); err != nil {
 		log.Errorf("execute sql error: %v", err)
 		return err
 	}
@@ -89,6 +196,7 @@ func (wfil Wfil) tracingWfilEventCron(ctx context.Context, _ *api.FullNodeStruct
 			}
 
 			fevmEvent := fevm.FevmEvent{
+				ContractAddress: wfilAddress,
 				Height:          uint64(receipt.Height),
 				TransactionHash: receipt.TransactionHash,
 				From:            receipt.From,
