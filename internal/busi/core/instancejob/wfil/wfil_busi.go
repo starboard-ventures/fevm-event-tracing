@@ -61,7 +61,7 @@ func (wfil Wfil) EventTracing(ctx context.Context, node *api.FullNodeStruct, arg
 	return g.Wait()
 }
 
-// CA -> wfil contract(EOA -> middle contracts -> wfil contract)
+// CA -> wfil contract(EOA -> middle contracts -> wfil contract, internal transaction)
 func (wfil Wfil) tracingWfilEventCronInInternalTXN(ctx context.Context, _ *api.FullNodeStruct, wfilAddress, eventHash, eventName string) error {
 	var (
 		maxHeightEvmReceipt fevm.EVMReceipt
@@ -113,7 +113,7 @@ func (wfil Wfil) tracingWfilEventCronInInternalTXN(ctx context.Context, _ *api.F
 		}
 
 		for _, ethLog := range logs {
-			if ethLog.Topics[0].String() != eventHash {
+			if ethLog.Address.String() != wfilAddress || ethLog.Topics[0].String() != eventHash {
 				continue
 			}
 
@@ -153,7 +153,7 @@ func (wfil Wfil) tracingWfilEventCronInInternalTXN(ctx context.Context, _ *api.F
 	return nil
 }
 
-// EOA -> wfil contract
+// EOA -> wfil contract(transaction)
 func (wfil Wfil) tracingWfilEventTXNCron(ctx context.Context, _ *api.FullNodeStruct, wfilAddress, eventHash, eventName string) error {
 	var (
 		maxHeightEvmReceipt fevm.EVMReceipt
