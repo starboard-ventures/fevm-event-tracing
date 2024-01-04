@@ -22,7 +22,7 @@ type EventHeightCheckpoint struct {
 	MaxRecordedHeight uint64    `xorm:"bigint notnull"`
 	EventHash         string    `xorm:"varchar(255) index notnull"`
 	EventName         string    `xorm:"varchar(255)"`
-	Type              uint8     `xorm:"smallint index comment('0 - transaction, 1 - internal transaction')"`
+	TxnType           uint8     `xorm:"smallint index comment('0 - transaction, 1 - internal transaction')"`
 	UpdatedAt         time.Time `xorm:"updated"`
 }
 

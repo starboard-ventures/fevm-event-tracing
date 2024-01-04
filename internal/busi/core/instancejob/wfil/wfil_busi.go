@@ -71,7 +71,7 @@ func (wfil Wfil) tracingWfilEventCronInInternalTXN(ctx context.Context, _ *api.F
 
 	recordedHeight.EventHash = eventHash
 	recordedHeight.EventName = eventName
-	recordedHeight.Type = InternalTXNType
+	recordedHeight.TxnType = InternalTXNType
 
 	if _, err := utils.X.Where("event_hash = ? and type = ?", eventHash, InternalTXNType).Get(&recordedHeight); err != nil {
 		log.Errorf("execute sql error: %v", err)
@@ -163,7 +163,7 @@ func (wfil Wfil) tracingWfilEventTXNCron(ctx context.Context, _ *api.FullNodeStr
 
 	recordedHeight.EventHash = eventHash
 	recordedHeight.EventName = eventName
-	recordedHeight.Type = TxnType
+	recordedHeight.TxnType = TxnType
 
 	// select * from event_height_checkpoint where event_hash = %eventHash%;
 	// select max(height) from evm_receipt;
