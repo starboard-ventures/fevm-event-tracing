@@ -18,6 +18,7 @@ type FevmEvent struct {
 	DB           string `toml:"database"`
 	Lotus        string `toml:"lotus"`
 	WfilContract string `toml:"wfil_contract"`
+	PfilContract string `toml:"pfil_contract"`
 }
 
 func InitConfFile(file string, cf *TomlConfig) error {

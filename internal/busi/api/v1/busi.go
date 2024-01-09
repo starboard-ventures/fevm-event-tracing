@@ -127,3 +127,28 @@ func WfilEventHandle(c *gin.Context) {
 
 	app.HTTPResponseOK(nil)
 }
+
+// pfil's event cron job godoc
+// @Description pfil's event cron job api, call by dolphin scheduler
+// @Tags Inner|Cron
+// @Accept application/json,json
+// @Produce application/json,json
+// @Success 200 {object} utils.ResponseCode
+// @Router /pfil-event-tracing-cron [post]
+func PfilEventCronHandle(c *gin.Context) {
+	app := utils.Gin{C: c}
+
+	lotus0, _ := c.Get(LOTUS0)
+	lotus0Cfg, _ := lotus0.(string)
+
+	pfil, _ := c.Get(PFIL)
+	pfilContract, _ := pfil.(string)
+
+	resp := core.PfilEventCronHandle(c.Request.Context(), lotus0Cfg, strings.ToLower(pfilContract))
+	if resp != nil {
+		app.HTTPResponse(http.StatusOK, resp.Response)
+		return
+	}
+
+	app.HTTPResponseOK(nil)
+}

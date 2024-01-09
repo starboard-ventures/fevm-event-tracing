@@ -80,6 +80,30 @@ const docTemplate = `{
                 }
             }
         },
+        "/pfil-event-tracing-cron": {
+            "post": {
+                "description": "pfil's event cron job api, call by dolphin scheduler",
+                "consumes": [
+                    "application/json",
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json",
+                    "application/json"
+                ],
+                "tags": [
+                    "Inner|Cron"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
+        },
         "/ping": {
             "get": {
                 "description": "Healthy examination",

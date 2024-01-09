@@ -30,6 +30,15 @@ func setWfilTrancingConfig() gin.HandlerFunc {
 	}
 }
 
+func setPfilTrancingConfig() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Set(v1.LOTUS0, utils.CNF.FevmEvent.Lotus)
+		c.Set(v1.PFIL, utils.CNF.FevmEvent.PfilContract)
+
+		c.Next()
+	}
+}
+
 func RegisterRoutes(r *gin.Engine) {
 	// r.Use(utils.Cors())
 	r.Use(cors.Default())
@@ -46,6 +55,10 @@ func RegisterRoutes(r *gin.Engine) {
 		{
 			apiv1.POST("/wfil-event-tracing-cron", setWfilTrancingConfig(), v1.WfilEventCronHandle)
 			// apiv1.POST("/wfil-event-tracing", setWfilTrancingConfig(), v1.WfilEventHandle)
+		}
+
+		{
+			apiv1.POST("/pfil-event-tracing-cron", setPfilTrancingConfig(), v1.PfilEventCronHandle)
 		}
 	}
 }

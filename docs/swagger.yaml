@@ -48,6 +48,22 @@ paths:
             type: integer
       tags:
       - Inner|Cron
+  /pfil-event-tracing-cron:
+    post:
+      consumes:
+      - application/json
+      - application/json
+      description: pfil's event cron job api, call by dolphin scheduler
+      produces:
+      - application/json
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+      tags:
+      - Inner|Cron
   /ping:
     get:
       consumes:
