@@ -105,3 +105,28 @@ func ReplEventCronHandle(c *gin.Context) {
 
 	app.HTTPResponseOK(nil)
 }
+
+// replAuction's event cron job godoc
+// @Description replAuction's event cron job api, call by dolphin scheduler
+// @Tags Inner|Cron
+// @Accept application/json,json
+// @Produce application/json,json
+// @Success 200 {object} utils.ResponseCode
+// @Router /repl-auction-event-tracing-cron [post]
+func ReplAuctionEventCronHandle(c *gin.Context) {
+	app := utils.Gin{C: c}
+
+	lotus0, _ := c.Get(LOTUS0)
+	lotus0Cfg, _ := lotus0.(string)
+
+	replAuction, _ := c.Get(REPLAUCTION)
+	replAuctionContract, _ := replAuction.(string)
+
+	resp := core.ReplAuctionEventCronHandle(c.Request.Context(), lotus0Cfg, strings.ToLower(replAuctionContract))
+	if resp != nil {
+		app.HTTPResponse(http.StatusOK, resp.Response)
+		return
+	}
+
+	app.HTTPResponseOK(nil)
+}

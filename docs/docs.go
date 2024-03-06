@@ -20,42 +20,6 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/deal-proposal-create-event-tracing": {
-            "post": {
-                "description": "deal-proposal-create's event manual job api",
-                "consumes": [
-                    "application/json",
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json",
-                    "application/json"
-                ],
-                "tags": [
-                    "Inner|Manual"
-                ],
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "name": "from",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "name": "to",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                }
-            }
-        },
         "/deal-proposal-create-event-tracing-cron": {
             "post": {
                 "description": "deal-proposal-create's event cron job api, call by dolphin scheduler",
@@ -134,9 +98,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/wfil-event-tracing": {
+        "/repl-auction-event-tracing-cron": {
             "post": {
-                "description": "wfil's event manual job api",
+                "description": "replAuction's event cron job api, call by dolphin scheduler",
                 "consumes": [
                     "application/json",
                     "application/json"
@@ -146,19 +110,31 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Inner|Manual"
+                    "Inner|Cron"
                 ],
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "name": "from",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "name": "to",
-                        "in": "query"
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
                     }
+                }
+            }
+        },
+        "/repl-event-tracing-cron": {
+            "post": {
+                "description": "repl's event cron job api, call by dolphin scheduler",
+                "consumes": [
+                    "application/json",
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json",
+                    "application/json"
+                ],
+                "tags": [
+                    "Inner|Cron"
                 ],
                 "responses": {
                     "200": {

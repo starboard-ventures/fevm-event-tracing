@@ -42,7 +42,7 @@ func setPfilTracingConfig() gin.HandlerFunc {
 func setReplTracingConfig() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Set(v1.LOTUS0, utils.CNF.FevmEvent.Lotus)
-		c.Set(v1.PFIL, utils.CNF.FevmEvent.ReplContract)
+		c.Set(v1.REPL, utils.CNF.FevmEvent.ReplContract)
 
 		c.Next()
 	}
@@ -51,7 +51,7 @@ func setReplTracingConfig() gin.HandlerFunc {
 func setReplAuctionTracingConfig() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Set(v1.LOTUS0, utils.CNF.FevmEvent.Lotus)
-		c.Set(v1.PFIL, utils.CNF.FevmEvent.ReplAuctionContract)
+		c.Set(v1.REPLAUCTION, utils.CNF.FevmEvent.ReplAuctionContract)
 
 		c.Next()
 	}
@@ -67,7 +67,6 @@ func RegisterRoutes(r *gin.Engine) {
 		apiv1.GET("/ping", v1.Ping)
 		{
 			apiv1.POST("/deal-proposal-create-event-tracing-cron", setDealProposalCreateTrancingConfig(), v1.DealProposalCreateEventCronHandle)
-			// apiv1.POST("/deal-proposal-create-event-tracing", setDealProposalCreateTrancingConfig(), v1.DealProposalCreateEventHandle)
 		}
 
 		{
@@ -77,7 +76,7 @@ func RegisterRoutes(r *gin.Engine) {
 		{
 			apiv1.POST("/pfil-event-tracing-cron", setPfilTracingConfig(), v1.PfilEventCronHandle)
 			apiv1.POST("/repl-event-tracing-cron", setReplTracingConfig(), v1.ReplEventCronHandle)
-			apiv1.POST("/repl-auction-event-tracing-cron", setReplAuctionTracingConfig())
+			apiv1.POST("/repl-auction-event-tracing-cron", setReplAuctionTracingConfig(), v1.ReplAuctionEventCronHandle)
 		}
 	}
 }

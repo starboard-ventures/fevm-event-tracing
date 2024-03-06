@@ -17,10 +17,6 @@ type FevmEvent struct {
 	Note            string `xorm:"text"`
 }
 
-func (r *FevmEvent) TableName() string {
-	return "fevm_event_test"
-}
-
 type EventHeightCheckpoint struct {
 	Id                uint64    `json:"-" xorm:"bigserial pk autoincr"`
 	MaxRecordedHeight uint64    `xorm:"bigint notnull"`
@@ -28,10 +24,6 @@ type EventHeightCheckpoint struct {
 	EventName         string    `xorm:"varchar(255)"`
 	TxnType           uint8     `xorm:"smallint index comment('0 - transaction, 1 - internal transaction')"`
 	UpdatedAt         time.Time `xorm:"updated"`
-}
-
-func (r *EventHeightCheckpoint) TableName() string {
-	return "event_height_checkpoint_test"
 }
 
 // Receipt evm transaction receipt

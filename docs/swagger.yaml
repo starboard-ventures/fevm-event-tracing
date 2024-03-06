@@ -9,29 +9,6 @@ info:
   title: starboard fevm event tracing job
   version: "1.0"
 paths:
-  /deal-proposal-create-event-tracing:
-    post:
-      consumes:
-      - application/json
-      - application/json
-      description: deal-proposal-create's event manual job api
-      parameters:
-      - in: query
-        name: from
-        type: integer
-      - in: query
-        name: to
-        type: integer
-      produces:
-      - application/json
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: integer
-      tags:
-      - Inner|Manual
   /deal-proposal-create-event-tracing-cron:
     post:
       consumes:
@@ -84,19 +61,12 @@ paths:
             type: string
       tags:
       - Sys
-  /wfil-event-tracing:
+  /repl-auction-event-tracing-cron:
     post:
       consumes:
       - application/json
       - application/json
-      description: wfil's event manual job api
-      parameters:
-      - in: query
-        name: from
-        type: integer
-      - in: query
-        name: to
-        type: integer
+      description: replAuction's event cron job api, call by dolphin scheduler
       produces:
       - application/json
       - application/json
@@ -106,7 +76,23 @@ paths:
           schema:
             type: integer
       tags:
-      - Inner|Manual
+      - Inner|Cron
+  /repl-event-tracing-cron:
+    post:
+      consumes:
+      - application/json
+      - application/json
+      description: repl's event cron job api, call by dolphin scheduler
+      produces:
+      - application/json
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+      tags:
+      - Inner|Cron
   /wfil-event-tracing-cron:
     post:
       consumes:
