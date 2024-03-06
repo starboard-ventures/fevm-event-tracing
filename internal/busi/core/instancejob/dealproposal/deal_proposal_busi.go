@@ -58,7 +58,11 @@ func (dpc DealProposalCreate) EventTracing(ctx context.Context, node *api.FullNo
 		return err
 	}
 
-	if err := utils.X.Where("height between ? and ? and logs like ?", recordedHeight.MaxRecordedHeight+1, maxHeightEvmReceipt.Height+1, "%"+DealProposalCreateEventHash+"%").Asc("height").Find(&evmReceipts); err != nil {
+	if maxHeightEvmReceipt.Height >= common.Finality {
+		maxHeightEvmReceipt.Height -= common.Finality
+	}
+
+	if err := utils.X.Where("height between ? and ? and logs like ?", recordedHeight.MaxRecordedHeight+1, maxHeightEvmReceipt.Height, "%"+DealProposalCreateEventHash+"%").Asc("height").Find(&evmReceipts); err != nil {
 		log.Errorf("execute sql error: %v", err)
 		return err
 	}
@@ -124,69 +128,6 @@ func (dpc DealProposalCreate) EventTracing(ctx context.Context, node *api.FullNo
 	recordedHeight.MaxRecordedHeight = uint64(maxHeightEvmReceipt.Height)
 	if err := common.UpdateEventHeightCheckoutpoint(ctx, &recordedHeight); err != nil {
 		return err
-	}
-
-	return nil
-}
-
-func (dpc DealProposalCreate) TracingDealProposalEvent(ctx context.Context, node *api.FullNodeStruct, minHeight, maxHeight uint64) error {
-	evmReceipts := make([]*fevm.EVMReceipt, 0)
-
-	if err := utils.X.Where("height between ? and ? and logs like ?", minHeight, maxHeight, "%"+DealProposalCreateEventHash+"%").Asc("height").Find(&evmReceipts); err != nil {
-		log.Errorf("execute sql error: %v", err)
-		return err
-	}
-
-	for _, receipt := range evmReceipts {
-		logs := make([]ethtypes.EthLog, 0)
-		if err := json.Unmarshal([]byte(receipt.Logs), &logs); err != nil {
-			log.Warnf("Unmarshal receipt[height: %v] log err: %v", receipt.Height, err)
-			continue
-		}
-
-		for _, ethLog := range logs {
-			if ethLog.Topics[0].String() != DealProposalCreateEventHash {
-				continue
-			}
-
-			fevmEvent := fevm.FevmEvent{
-				Height:          uint64(receipt.Height),
-				TransactionHash: receipt.TransactionHash,
-				From:            receipt.From,
-				To:              receipt.To,
-				Status:          receipt.Status,
-				LogsBloom:       receipt.LogsBloom,
-				Logs:            receipt.Logs,
-				EventHash:       ethLog.Topics[0].String(),
-				EventName:       DealProposalCreateEventName,
-			}
-
-			// invoke getDealProposal on chain
-			fromEthAddr, err := ethtypes.ParseEthAddress(receipt.From) // any eth address is ok.
-			if err != nil {
-				log.Errorf("parsing `from` eth address failed: %v", err)
-				continue
-			}
-			res, err := dpc.getDealProposal(ctx, node, receipt.To, ethLog.Topics[1].String(), fromEthAddr)
-			if err != nil {
-				log.Errorf("eth call for deal proposal failed: %v", err)
-				continue
-			}
-
-			var dpc market.DealProposal
-			if err := dpc.UnmarshalCBOR(bytes.NewReader(res)); err != nil {
-				log.Errorf("cbor unmarshal failed: %v", err)
-				continue
-			}
-
-			res, _ = json.Marshal(&dpc)
-			fevmEvent.Note = string(res)
-
-			if _, err := utils.X.Insert(&fevmEvent); err != nil {
-				log.Errorf("execute sql error: %v", err)
-				return err
-			}
-		}
 	}
 
 	return nil

@@ -31,40 +31,6 @@ func DealProposalCreateEventCronHandle(c *gin.Context) {
 	app.HTTPResponseOK(nil)
 }
 
-// deal-proposal-create's event manual job godoc
-// @Description deal-proposal-create's event manual job api
-// @Tags Inner|Manual
-// @Accept application/json,json
-// @Produce application/json,json
-// @Param RequestHeight query core.RequestHeight false "RequestHeight"
-// @Success 200 {object} utils.ResponseCode
-// @Router /deal-proposal-create-event-tracing [post]
-func DealProposalCreateEventHandle(c *gin.Context) {
-	app := utils.Gin{C: c}
-
-	var r core.RequestHeight
-	if err := c.ShouldBindQuery(&r); err != nil {
-		app.HTTPResponse(http.StatusOK, utils.NewResponse(utils.CodeBadRequest, err.Error(), nil))
-		return
-	}
-
-	if err := r.Validate(); err != nil {
-		app.HTTPResponse(http.StatusBadRequest, utils.NewResponse(utils.CodeBadRequest, err.Error(), nil))
-		return
-	}
-
-	lotus0, _ := c.Get(LOTUS0)
-	r.Lotus0, _ = lotus0.(string)
-
-	resp := core.DealProposalCreateEventHandle(c.Request.Context(), &r)
-	if resp != nil {
-		app.HTTPResponse(http.StatusOK, resp.Response)
-		return
-	}
-
-	app.HTTPResponseOK(nil)
-}
-
 // wfil's event cron job godoc
 // @Description wfil's event cron job api, call by dolphin scheduler
 // @Tags Inner|Cron
@@ -90,44 +56,6 @@ func WfilEventCronHandle(c *gin.Context) {
 	app.HTTPResponseOK(nil)
 }
 
-// wfil's event manual job godoc
-// @Description wfil's event manual job api
-// @Tags Inner|Manual
-// @Accept application/json,json
-// @Produce application/json,json
-// @Param RequestHeight query core.RequestHeight false "RequestHeight"
-// @Success 200 {object} utils.ResponseCode
-// @Router /wfil-event-tracing [post]
-func WfilEventHandle(c *gin.Context) {
-	app := utils.Gin{C: c}
-
-	var r core.RequestHeight
-	if err := c.ShouldBindQuery(&r); err != nil {
-		app.HTTPResponse(http.StatusOK, utils.NewResponse(utils.CodeBadRequest, err.Error(), nil))
-		return
-	}
-
-	if err := r.Validate(); err != nil {
-		app.HTTPResponse(http.StatusBadRequest, utils.NewResponse(utils.CodeBadRequest, err.Error(), nil))
-		return
-	}
-
-	lotus0, _ := c.Get(LOTUS0)
-	r.Lotus0, _ = lotus0.(string)
-
-	wfil, _ := c.Get(WFIL)
-	r.WfilContract, _ = wfil.(string)
-	r.WfilContract = strings.ToLower(r.WfilContract)
-
-	resp := core.WfilEventHandle(c.Request.Context(), &r)
-	if resp != nil {
-		app.HTTPResponse(http.StatusOK, resp.Response)
-		return
-	}
-
-	app.HTTPResponseOK(nil)
-}
-
 // pfil's event cron job godoc
 // @Description pfil's event cron job api, call by dolphin scheduler
 // @Tags Inner|Cron
@@ -145,6 +73,31 @@ func PfilEventCronHandle(c *gin.Context) {
 	pfilContract, _ := pfil.(string)
 
 	resp := core.PfilEventCronHandle(c.Request.Context(), lotus0Cfg, strings.ToLower(pfilContract))
+	if resp != nil {
+		app.HTTPResponse(http.StatusOK, resp.Response)
+		return
+	}
+
+	app.HTTPResponseOK(nil)
+}
+
+// repl's event cron job godoc
+// @Description repl's event cron job api, call by dolphin scheduler
+// @Tags Inner|Cron
+// @Accept application/json,json
+// @Produce application/json,json
+// @Success 200 {object} utils.ResponseCode
+// @Router /repl-event-tracing-cron [post]
+func ReplEventCronHandle(c *gin.Context) {
+	app := utils.Gin{C: c}
+
+	lotus0, _ := c.Get(LOTUS0)
+	lotus0Cfg, _ := lotus0.(string)
+
+	repl, _ := c.Get(REPL)
+	replContract, _ := repl.(string)
+
+	resp := core.ReplEventCronHandle(c.Request.Context(), lotus0Cfg, strings.ToLower(replContract))
 	if resp != nil {
 		app.HTTPResponse(http.StatusOK, resp.Response)
 		return

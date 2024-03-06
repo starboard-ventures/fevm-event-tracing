@@ -14,11 +14,13 @@ type TomlConfig struct {
 }
 
 type FevmEvent struct {
-	Addr         string `toml:"listen"`
-	DB           string `toml:"database"`
-	Lotus        string `toml:"lotus"`
-	WfilContract string `toml:"wfil_contract"`
-	PfilContract string `toml:"pfil_contract"`
+	Addr                string `toml:"listen"`
+	DB                  string `toml:"database"`
+	Lotus               string `toml:"lotus"`
+	WfilContract        string `toml:"wfil_contract"`
+	PfilContract        string `toml:"pfil_contract"`
+	ReplContract        string `toml:"repl_contract"`
+	ReplAuctionContract string `toml:"repl_auction_contract"`
 }
 
 func InitConfFile(file string, cf *TomlConfig) error {

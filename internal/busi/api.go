@@ -30,10 +30,28 @@ func setWfilTrancingConfig() gin.HandlerFunc {
 	}
 }
 
-func setPfilTrancingConfig() gin.HandlerFunc {
+func setPfilTracingConfig() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Set(v1.LOTUS0, utils.CNF.FevmEvent.Lotus)
 		c.Set(v1.PFIL, utils.CNF.FevmEvent.PfilContract)
+
+		c.Next()
+	}
+}
+
+func setReplTracingConfig() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Set(v1.LOTUS0, utils.CNF.FevmEvent.Lotus)
+		c.Set(v1.PFIL, utils.CNF.FevmEvent.ReplContract)
+
+		c.Next()
+	}
+}
+
+func setReplAuctionTracingConfig() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Set(v1.LOTUS0, utils.CNF.FevmEvent.Lotus)
+		c.Set(v1.PFIL, utils.CNF.FevmEvent.ReplAuctionContract)
 
 		c.Next()
 	}
@@ -54,11 +72,12 @@ func RegisterRoutes(r *gin.Engine) {
 
 		{
 			apiv1.POST("/wfil-event-tracing-cron", setWfilTrancingConfig(), v1.WfilEventCronHandle)
-			// apiv1.POST("/wfil-event-tracing", setWfilTrancingConfig(), v1.WfilEventHandle)
 		}
 
 		{
-			apiv1.POST("/pfil-event-tracing-cron", setPfilTrancingConfig(), v1.PfilEventCronHandle)
+			apiv1.POST("/pfil-event-tracing-cron", setPfilTracingConfig(), v1.PfilEventCronHandle)
+			apiv1.POST("/repl-event-tracing-cron", setReplTracingConfig(), v1.ReplEventCronHandle)
+			apiv1.POST("/repl-auction-event-tracing-cron", setReplAuctionTracingConfig())
 		}
 	}
 }
