@@ -23,6 +23,8 @@ make # make to see help
      - /api/v1/deal-proposal-create-event-tracing-cron[POST]
      - /api/v1//wfil-event-tracing-cron[POST]
      - /api/v1/pfil-event-tracing-cron[POST]
+     - /api/v1/repl-event-tracing-cron[POST]
+     - /api/v1/repl-auction-event-tracing-cron[POST]
     without query paramters by dolphin scheduler every day.
 
 
