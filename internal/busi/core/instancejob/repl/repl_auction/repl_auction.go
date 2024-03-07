@@ -16,8 +16,8 @@ type ReplAuction struct {
 }
 
 const (
-	FILReceivedEventHash = "0x5a58a82d7d47879810016297098e56a6a9e43f3296458b1b5bf67490fbcfc380"
-	FILReceivedEventName = "FILReceived(uint256, address)"
+	FILReceivedEventHash = "0xa8460747e40836bec1c1362c948913239b816f81cc759fe9d7597176fa4ac648"
+	FILReceivedEventName = "FILReceived(uint256,address)"
 
 	TxnType         = 0
 	InternalTXNType = 1
