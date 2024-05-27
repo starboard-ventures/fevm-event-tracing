@@ -60,7 +60,7 @@ func (replAuction ReplAuction) tracingReplAuctionEventTXNCron(ctx context.Contex
 func getTheEventContent(eventName string, ethLog *ethtypes.EthLog) string {
 	switch eventName {
 	case FILReceivedEventName:
-		if len(ethLog.Topics) > 0 {
+		if len(ethLog.Topics) > 1 {
 			onNewFundReceived := FILReceived{
 				Amount:    ethLog.Data.String(),
 				AgentAddr: ethLog.Topics[1].String(),
