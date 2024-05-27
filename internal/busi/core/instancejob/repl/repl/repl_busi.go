@@ -75,7 +75,7 @@ func getTheEventContent(eventName string, ethLog *ethtypes.EthLog) string {
 		var output OnNewFundReceivedObj
 		err := typ.DecodeStruct(ethLog.Data, &output)
 		if err != nil {
-			log.Errorf("Get Error during decoding the FILReceived: %v", err)
+			log.Errorf("Get Error during decoding the OnNewFundReceived: %v", err)
 			return ""
 		}
 		onNewFundReceived := OnNewFundReceived{
