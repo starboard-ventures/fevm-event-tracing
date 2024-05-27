@@ -62,9 +62,9 @@ func TracingContractEventTXNCron(ctx context.Context, contractAddress, eventHash
 		return err
 	}
 
-	//if maxHeightEvmReceipt.Height >= Finality {
-	//	maxHeightEvmReceipt.Height -= Finality
-	//}
+	if maxHeightEvmReceipt.Height >= Finality {
+		maxHeightEvmReceipt.Height -= Finality
+	}
 
 	if assignTo {
 		if err := utils.X.Where("height between ? and ? and \"to\" = ? and logs like ?", recordedHeight.MaxRecordedHeight+1, maxHeightEvmReceipt.Height, contractAddress, "%"+eventHash+"%").Asc("height").Find(&evmReceipts); err != nil {
@@ -150,9 +150,9 @@ func TracingContractEventCronInInternalTXN(ctx context.Context, contractAddress,
 		return err
 	}
 
-	//if maxHeightEvmReceipt.Height >= Finality {
-	//	maxHeightEvmReceipt.Height -= Finality
-	//}
+	if maxHeightEvmReceipt.Height >= Finality {
+		maxHeightEvmReceipt.Height -= Finality
+	}
 
 	if err := utils.X.Where("height between ? and ? and \"to\" = ?", recordedHeight.MaxRecordedHeight+1, maxHeightEvmReceipt.Height, contractAddress).Asc("height").Find(&evmInternalTxn); err != nil {
 		log.Errorf("execute sql error: %v", err)
