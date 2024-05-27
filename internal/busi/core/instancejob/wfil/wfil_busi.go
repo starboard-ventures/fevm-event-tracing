@@ -65,7 +65,7 @@ func (wfil Wfil) tracingWfilEventCronInInternalTXN(ctx context.Context, _ *api.F
 
 // EOA -> wfil contract(transaction)
 func (wfil Wfil) tracingWfilEventTXNCron(ctx context.Context, _ *api.FullNodeStruct, wfilAddress, eventHash, eventName string) error {
-	return common.TracingContractEventTXNCron(ctx, wfilAddress, eventHash, eventName, getTheEventContent)
+	return common.TracingContractEventTXNCron(ctx, wfilAddress, eventHash, eventName, true, getTheEventContent)
 }
 
 func getTheEventContent(eventName string, ethLog *ethtypes.EthLog) string {

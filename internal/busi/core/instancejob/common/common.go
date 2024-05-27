@@ -38,7 +38,7 @@ const (
 type GetEventContentCallback func(string, *ethtypes.EthLog) string
 
 // EOA -> x contract(transaction)
-func TracingContractEventTXNCron(ctx context.Context, contractAddress, eventHash, eventName string, callEventContentFn GetEventContentCallback) error {
+func TracingContractEventTXNCron(ctx context.Context, contractAddress, eventHash, eventName string, assignTo bool, callEventContentFn GetEventContentCallback) error {
 	var (
 		maxHeightEvmReceipt fevm.EVMReceipt
 		recordedHeight      fevm.EventHeightCheckpoint
@@ -66,10 +66,19 @@ func TracingContractEventTXNCron(ctx context.Context, contractAddress, eventHash
 		maxHeightEvmReceipt.Height -= Finality
 	}
 
-	if err := utils.X.Where("height between ? and ? and \"to\" = ? and logs like ?", recordedHeight.MaxRecordedHeight+1, maxHeightEvmReceipt.Height, contractAddress, "%"+eventHash+"%").Asc("height").Find(&evmReceipts); err != nil {
-		log.Errorf("execute sql error: %v", err)
-		return err
+	if assignTo {
+		if err := utils.X.Where("height between ? and ? and \"to\" = ? and logs like ?", recordedHeight.MaxRecordedHeight+1, maxHeightEvmReceipt.Height, contractAddress, "%"+eventHash+"%").Asc("height").Find(&evmReceipts); err != nil {
+			log.Errorf("execute sql error: %v", err)
+			return err
+		}
+	} else {
+		if err := utils.X.Where("height between ? and ? and logs like ?", recordedHeight.MaxRecordedHeight+1, maxHeightEvmReceipt.Height, "%"+eventHash+"%").Asc("height").Find(&evmReceipts); err != nil {
+			log.Errorf("execute sql error: %v", err)
+			return err
+		}
 	}
+
+	log.Errorf("height between %v and %v and logs like %v", recordedHeight.MaxRecordedHeight+1, maxHeightEvmReceipt.Height, "%"+eventHash+"%")
 
 	for _, receipt := range evmReceipts {
 		logs := make([]ethtypes.EthLog, 0)
