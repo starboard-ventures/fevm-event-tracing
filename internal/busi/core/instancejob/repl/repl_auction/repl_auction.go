@@ -5,9 +5,15 @@ import (
 	"encoding/json"
 	"event-trace/internal/busi/core/instancejob/common"
 
+	"math/big"
+
 	"github.com/filecoin-project/lotus/api"
 	"github.com/filecoin-project/lotus/chain/types/ethtypes"
 
+	"github.com/umbracle/ethgo"
+	ethabi "github.com/umbracle/ethgo/abi"
+
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -57,19 +63,29 @@ func (replAuction ReplAuction) tracingReplAuctionEventTXNCron(ctx context.Contex
 	return common.TracingContractEventTXNCron(ctx, replAuctionAddress, eventHash, eventName, false, getTheEventContent)
 }
 
+type FILReceivedObj struct {
+	A *big.Int
+	B ethgo.Address
+}
+
 func getTheEventContent(eventName string, ethLog *ethtypes.EthLog) string {
 	switch eventName {
 	case FILReceivedEventName:
-		if len(ethLog.Topics) > 1 {
-			onNewFundReceived := FILReceived{
-				Amount:    ethLog.Data.String(),
-				AgentAddr: ethLog.Topics[1].String(),
-			}
-
-			data, _ := json.Marshal(onNewFundReceived)
-			return string(data)
+		typ := ethabi.MustNewType("tuple(uint256 a, address b)")
+		var output FILReceivedObj
+		err := typ.DecodeStruct(ethLog.Data, &output)
+		if err != nil {
+			log.Errorf("Get Error during decoding the FILReceived: %v", err)
+			return ""
 		}
-		return ""
+
+		onNewFundReceived := FILReceived{
+			Amount:    output.A.String(),
+			AgentAddr: output.B.String(),
+		}
+
+		data, _ := json.Marshal(onNewFundReceived)
+		return string(data)
 	}
 	return ""
 }

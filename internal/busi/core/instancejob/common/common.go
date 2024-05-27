@@ -78,8 +78,6 @@ func TracingContractEventTXNCron(ctx context.Context, contractAddress, eventHash
 		}
 	}
 
-	log.Errorf("height between %v and %v and logs like %v", recordedHeight.MaxRecordedHeight+1, maxHeightEvmReceipt.Height, "%"+eventHash+"%")
-
 	for _, receipt := range evmReceipts {
 		logs := make([]ethtypes.EthLog, 0)
 		if err := json.Unmarshal([]byte(receipt.Logs), &logs); err != nil {
