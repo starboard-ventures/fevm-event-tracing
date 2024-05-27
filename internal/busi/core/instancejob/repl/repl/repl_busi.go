@@ -60,7 +60,7 @@ func (repl Repl) tracingReplEventCronInInternalTXN(ctx context.Context, _ *api.F
 
 // EOA -> repl contract(transaction)
 func (repl Repl) tracingReplEventTXNCron(ctx context.Context, _ *api.FullNodeStruct, replAddress, eventHash, eventName string) error {
-	return common.TracingContractEventTXNCron(ctx, replAddress, eventHash, eventName, getTheEventContent)
+	return common.TracingContractEventTXNCron(ctx, replAddress, eventHash, eventName, false, getTheEventContent)
 }
 
 func getTheEventContent(eventName string, ethLog *ethtypes.EthLog) string {

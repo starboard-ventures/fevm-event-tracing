@@ -54,7 +54,7 @@ func (replAuction ReplAuction) tracingReplAuctionEventCronInInternalTXN(ctx cont
 
 // EOA -> replAuction contract(transaction)
 func (replAuction ReplAuction) tracingReplAuctionEventTXNCron(ctx context.Context, _ *api.FullNodeStruct, replAuctionAddress, eventHash, eventName string) error {
-	return common.TracingContractEventTXNCron(ctx, replAuctionAddress, eventHash, eventName, getTheEventContent)
+	return common.TracingContractEventTXNCron(ctx, replAuctionAddress, eventHash, eventName, false, getTheEventContent)
 }
 
 func getTheEventContent(eventName string, ethLog *ethtypes.EthLog) string {
