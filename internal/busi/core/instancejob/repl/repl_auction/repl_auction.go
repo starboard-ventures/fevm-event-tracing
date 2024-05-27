@@ -60,13 +60,16 @@ func (replAuction ReplAuction) tracingReplAuctionEventTXNCron(ctx context.Contex
 func getTheEventContent(eventName string, ethLog *ethtypes.EthLog) string {
 	switch eventName {
 	case FILReceivedEventName:
-		onNewFundReceived := FILReceived{
-			Amount:    ethLog.Data.String(),
-			AgentAddr: ethLog.Topics[1].String(),
-		}
+		if len(ethLog.Topics) > 0 {
+			onNewFundReceived := FILReceived{
+				Amount:    ethLog.Data.String(),
+				AgentAddr: ethLog.Topics[1].String(),
+			}
 
-		data, _ := json.Marshal(onNewFundReceived)
-		return string(data)
+			data, _ := json.Marshal(onNewFundReceived)
+			return string(data)
+		}
+		return ""
 	}
 	return ""
 }
