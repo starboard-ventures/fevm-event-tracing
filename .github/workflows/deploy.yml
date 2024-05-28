@@ -29,7 +29,7 @@ jobs:
     steps:
       - name: Configure AWS credentials
         id: aws_credentials
-        uses: aws-actions/configure-aws-credentials@v1-node16
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ inputs.environment == 'prod' && secrets.PROD_AWS_ACCESS_KEY_ID || secrets.DEV_AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ inputs.environment == 'prod' && secrets.PROD_AWS_SECRET_ACCESS_KEY || secrets.DEV_AWS_SECRET_ACCESS_KEY }}
@@ -38,12 +38,12 @@ jobs:
 
       - name: Login to Amazon ECR
         id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+        uses: aws-actions/amazon-ecr-login@v2
         with:
           registries: "${{ inputs.aws_account_repository }}"
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: ${{ inputs.cicd_repo }}
           token: ${{ secrets.CICD_REPO_READ_TOKEN }}
