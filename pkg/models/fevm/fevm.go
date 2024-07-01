@@ -3,7 +3,7 @@ package fevm
 import "time"
 
 type FevmEvent struct {
-	Id              uint64 `json:"-" xorm:"bigserial pk autoincr"`
+	Id              uint64 `json:"-" xorm:"bigserial autoincr"`
 	ContractAddress string `xorm:"varchar(255) index notnull default ''"`
 	Height          uint64 `xorm:"bigint notnull"`
 	TransactionHash string `xorm:"varchar(255) notnull pk"`
@@ -15,6 +15,7 @@ type FevmEvent struct {
 	EventHash       string `xorm:"varchar(255) index notnull default ''"`
 	EventName       string `xorm:"varchar(255) index notnull default ''"`
 	Note            string `xorm:"text"`
+	LogIndex        int64  `xorm:"integer notnull pk default 0"`
 }
 
 type EventHeightCheckpoint struct {
