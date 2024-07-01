@@ -101,6 +101,7 @@ func TracingContractEventTXNCron(ctx context.Context, contractAddress, eventHash
 				Logs:            receipt.Logs,
 				EventHash:       ethLog.Topics[0].String(),
 				EventName:       eventName,
+				LogIndex:        int64(ethLog.LogIndex),
 			}
 
 			fevmEvent.Note = callEventContentFn(eventName, &ethLog)
