@@ -85,7 +85,7 @@ func TracingContractEventTXNCron(ctx context.Context, contractAddress, eventHash
 			continue
 		}
 
-		for _, ethLog := range logs {
+		for idx, ethLog := range logs {
 			if ethLog.Topics[0].String() != eventHash {
 				continue
 			}
@@ -101,7 +101,7 @@ func TracingContractEventTXNCron(ctx context.Context, contractAddress, eventHash
 				Logs:            receipt.Logs,
 				EventHash:       ethLog.Topics[0].String(),
 				EventName:       eventName,
-				LogIndex:        int64(ethLog.LogIndex),
+				LogIndex:        int64(idx),
 			}
 
 			fevmEvent.Note = callEventContentFn(eventName, &ethLog)
