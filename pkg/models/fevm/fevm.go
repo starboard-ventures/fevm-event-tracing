@@ -14,7 +14,7 @@ type FevmEvent struct {
 	Logs            string `xorm:"text notnull default ''"`
 	EventHash       string `xorm:"varchar(255) index notnull default ''"`
 	EventName       string `xorm:"varchar(255) index notnull default ''"`
-	Note            string `xorm:"text"`
+	Note            string `xorm:"text pk"`
 	LogIndex        int64  `xorm:"integer notnull pk default 0"`
 }
 
